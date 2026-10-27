@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="web_widget_one2many_tree_line_duplicate.ListRenderer"
+        t-inherit="web.ListRenderer"
+        t-inherit-mode="extension"
+    >
+        <xpath expr="//t[@t-foreach='optionalFieldGroups']" position="after">
+            <t t-if="isX2Many and activeActions.create and duplicateLineAllowed">
+                <div role="separator" class="dropdown-divider" />
+                <DropdownItem
+                    parentClosingMode="'none'"
+                    onSelected="() => this.toggleDuplicateLineColumn()"
+                >
+                    <CheckBox
+                        onChange="() => this.toggleDuplicateLineColumn()"
+                        value="duplicateLineColumn"
+                        name="'duplicate_line'"
+                    >
+                        <span class="d-flex align-items-center">
+                            <span class="text-truncate">Duplicate Line Button</span>
+                        </span>
+                    </CheckBox>
+                </DropdownItem>
+            </t>
+        </xpath>
+        <!-- Header cell for the dedicated clone column. Rendered like the core
+             delete actions column (outside the columns loop), so it is never
+             counted in `columns` and can't shift aggregates. -->
+        <xpath
+            expr="//thead//th[@t-if='displayOptionalFields or activeActions.onDelete']"
+            position="before"
+        >
+            <th
+                t-if="hasDuplicateLineColumn"
+                t-on-keydown="(ev) => this.onCellKeydown(ev)"
+                class="o_list_duplicate_line"
+            />
+        </xpath>
+        <xpath
+            expr="//tfoot//td[@t-if='displayOptionalFields or activeActions.onDelete']"
+            position="before"
+        >
+            <td t-if="hasDuplicateLineColumn" />
+        </xpath>
+    </t>
+    <t
+        t-name="web_widget_one2many_tree_line_duplicate.ListRenderer.RecordRow"
+        t-inherit="web.ListRenderer.RecordRow"
+        t-inherit-mode="extension"
+    >
+        <xpath
+            expr="//t[@t-if='displayOptionalFields or hasX2ManyAction']"
+            position="before"
+        >
+            <t t-if="hasDuplicateLineColumn">
+                <td
+                    t-if="isDuplicableLine(record)"
+                    class="o_list_duplicate_line text-center"
+                    t-on-click.stop="() => this.onCloneIconClick(record)"
+                    tabindex="-1"
+                >
+                    <button
+                        class="fa fa-clone"
+                        name="duplicate"
+                        aria-label="Duplicate row"
+                        title="Duplicate row"
+                        tabindex="-1"
+                    />
+                </td>
+                <td t-else="" class="o_list_duplicate_line text-center" tabindex="-1" />
+            </t>
+        </xpath>
+    </t>
+</templates>
